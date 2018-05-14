@@ -1,7 +1,8 @@
 
 import sys
+sys.path.append('../../')
 import data_processing as ddp
-from models import tfbs_first_model as mod
+import models.tfbs_first_model as mod
 
 def test():
     data_dict = ddp.sample_data_dict()
