@@ -1,18 +1,18 @@
 # genomics
 
-How to RUN:
-change line 222 in https://github.com/rohit06nitbpl/genomics/blob/master/tfbs/source_code/tensorflow/experiments/dreamc/data_processing.py  according to location of data_dir on your disk
-Run python file https://github.com/rohit06nitbpl/genomics/blob/master/tfbs/source_code/tensorflow/experiments/dreamc/experiments.py without argument on latest tensorflow environment.
+# How to RUN:
+1. change line 222 in https://github.com/rohit06nitbpl/genomics/blob/master/tfbs/source_code/tensorflow/experiments/dreamc/data_processing.py  according to location of data_dir on your disk
+2. Run python file https://github.com/rohit06nitbpl/genomics/blob/master/tfbs/source_code/tensorflow/experiments/dreamc/experiments.py without argument on latest tensorflow environment.
 
 Device Placement and Training log are done.
 
-How to RUN Tensorboard:
+# How to RUN Tensorboard:
+
 tensorboard --logdir=genomics/tfbs/source_code/tensorflow/dataset/sample_dataset/logs
 
- Graph and Scaler can be visualised in Tensorboard
+Graph and Scaler can be visualised in Tensorboard
  
-Description
- 
+# Description
 I used this code in very initial experiments, I also used Amino Acid sequences of TF as 
 additional feature, just to see its usefulness in the prediction of TF binding 
 even for unknown TF. Our earlier focus was to predict TF binding sites for even 
@@ -38,8 +38,7 @@ This makes it slow to fill queue for class A. If you run my code, you will see, 
 It can be made much faster on cluster using big data technologies like Apache Spark and Hadoop, and They can gather data and push into queue much quickly 
 than single system. 
  
-Main features of the code:
- 
+# Main features of the code:
 1. Very modular code, This same code can be used for training various kind of data and model by writing new stuff using inheritance in object oriented manner.
 2. For Example, for sample data set, I have only specific code in TFDataReader, TFBSFirstModel class and data_processing.py (file to process data itself). 
 3. Every other piece if code in pipeline can be leveraged as it is.
@@ -47,7 +46,7 @@ Main features of the code:
 5. I have used proper name scoping in again in modular manner to visualise graph in Tensorboard, along with tf.summaries,  
 6. data is passed using data_dict rather than command line parameter, cause this dict can be stored and retrieved in automated manner.
  
-To Dos
+# To Dos
 1. Finish multi GPU model using Tower Fashion
 2. Finish Parameter Visualization, Embedding visualization
 3. Complete tf.data.Dataset and compare performances
