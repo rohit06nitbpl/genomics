@@ -1,5 +1,8 @@
 import tensorflow as tf
 import time
+import sys
+sys.path.append('../../../../../')
+
 from tfbs.source_code.tensorflow.core.abstract_model import Model
 import tfbs.source_code.tensorflow.core.layers.simple as simple
 
