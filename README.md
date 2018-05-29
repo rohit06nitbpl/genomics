@@ -1,24 +1,53 @@
-# genomics
+# Genomics
 
-# How to RUN:
-1. change line 222 in https://github.com/rohit06nitbpl/genomics/blob/master/tfbs/source_code/tensorflow/experiments/dreamc/data_processing.py  according to location of data_dir on your disk
+# Extract Transform Load Pipeline
+1. Extract: Read using local file system (HDD or SSD) or remote file system (GCS or HDFS)
+2. Transform: Effectively utilize CPU cores to parse and perform pre processing, batching
+3. Load: Heavy lifting of computation on many GPUS or TPUs locally or across cluster
+
+# Feeding Data to Graph 
+1. Initialize Tensors with input data into the Graph: Bloat Graph size, Used for trivial problem and on single GPU, Very inefficient to duplicate Graph on multiple device
+2. Feed data into Graph using dictionary: Huge memory utilization, and also huge disk requirement for large preprocessed data
+3. Input pipeline using Queue: Queue Runner are implemented in pyhton, Efficients but can not saturate current generation multiple GPUs
+4. Input pipeline using tf.Data API: Implemented using C++, parallelize I/O, transform and load steps using background threads
+
+# Variable Distribution in Multi GPU and Distributed Model
+1. Parameter Servers: Parameters are pinned to parameter server, and they are implicitly copied to worker, gradient is computed at worker and aggregated at parameter server
+2. Replicated Variables: Each GPUs or worker has its own copy of variable, single device (CPU or GPU) is then used to aggregate gradient
+3. Replicated Variables in Distributed Environment: Each worker has local copy of variables, local copy is then updated using parameter server which aggregates gradient 
+
+Keeping local copies of variables allows for faster computation
+
+# Code Description
+1. Multi GPUs Model, Uses Input Pipeline using Queue, Variable distribution are done using Parameter Server approach
+2. Parameter are pinned to CPU, and GPUs if available serves as worker
+3. Very Modular and Object Oriented Design, Core module abstract away basic routine functionality and also provide layers to implement new models
+4. For example, for sample dataset, I only implemented TFBSAAFileReader, TFBS_AA_CNN_MODEL classes apart from pre processing
+5. proper name scoping for visualization of Graph in Tensorborad along with tf.summaries
+6. data is passed using data_dict rather than command line parameter, cause this dict can be stored and retrieved in automated manner
+
+# How to RUN : Sample Dataset
+1. Change line 222 in https://github.com/rohit06nitbpl/genomics/blob/master/tfbs/source_code/tensorflow/models/dreamc/pre_processing.py#L222  according to location of data_dir on your disk
 2. Run python file https://github.com/rohit06nitbpl/genomics/blob/master/tfbs/source_code/tensorflow/experiments/dreamc/experiments.py without argument on latest tensorflow environment.
+3. Add available GPUs on line 19 in https://github.com/rohit06nitbpl/genomics/blob/master/tfbs/source_code/tensorflow/models/dreamc/experiments.py#L19
 
 Device Placement and Training log are done.
 
-# How to RUN Tensorboard:
+# How to RUN Tensorboard : Sample Dataset
 
-tensorboard --logdir=genomics/tfbs/source_code/tensorflow/dataset/sample_dataset/logs
+tensorboard --logdir=genomics/tfbs/source_code/tensorflow/dataset/dreamc/sample_dataset/attempt0/train/logs
 
 Graph and Scaler can be visualised in Tensorboard
  
-# Description
-I used this code in very initial experiments, I also used Amino Acid sequences of TF as 
+# Sample Data Description
+It is small self made data in similar format as DREAM-ENCODE TF in-vivo binding challenge data
+
+I used this model in this code as very initial experiments, I also used Amino Acid sequences of TF as 
 additional feature, just to see its usefulness in the prediction of TF binding 
-even for unknown TF. Our earlier focus was to predict TF binding sites for even 
-for unknown TFs (i.e. not seen in experiments), but later on, I only focused on improving Dream Challenge results.
+even for unknown TF (i.e. for which experiments are not done). Our earlier focus was to predict TF binding sites for even 
+for unknown TFs , but later on, I only focused on improving Dream Challenge results.
  
-I am reading tsv format files in this code rather than zipped version. Although, lately I have used zipped versions and tools like bedtool etc. mentioned on website.
+I am reading tsv format files in this code rather than zipped version. Although, lately I have used zipped versions and tools like bedtool etc. mentioned on DREAM-ENCODE website.
  
 I am creating input Tensors on the fly. This way, I am not storing huge one hot matrix in memory or disk (data set is huge in genomics).
  
@@ -36,19 +65,10 @@ In fact, In sample data set, I used in this code, size of class A file is very s
 This makes it slow to fill queue for class A. If you run my code, you will see, training waits intermittently for queue of class A. 
  
 It can be made much faster on cluster using big data technologies like Apache Spark and Hadoop, and They can gather data and push into queue much quickly 
-than single system. 
+than a single system. 
  
-# Main features of the code:
-1. Very modular code, This same code can be used for training various kind of data and model by writing new stuff using inheritance in object oriented manner.
-2. For Example, for sample data set, I have only specific code in TFBSAAFileReader, TFBS_AA_CNN_MODEL class and data_processing.py (file to process data itself).
-3. Every other piece if code in pipeline can be leveraged as it is.
-4. It will be easy to extend this code on multi-gpu, modular manner would make it easier to do device placement of nodes. 
-5. I have used proper name scoping in again in modular manner to visualise graph in Tensorboard, along with tf.summaries,  
-6. data is passed using data_dict rather than command line parameter, cause this dict can be stored and retrieved in automated manner.
- 
-# To Dos
-1. Finish multi GPU model using Tower Fashion
-2. Finish Parameter Visualization, Embedding visualization
-3. Complete tf.data.Dataset and compare performances
-4. Complete Distributed implementation using https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks 
-5. Watch out https://www.tensorflow.org/versions/r1.1/performance/performance_models
+# To Do
+1. Upload 1D implementation of Capsules I used for TF Binding Problem
+2. Add Pipeline using tf.data() API and compare performances using real world data like mnist
+3. Complete Distributed implementation using https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks 
+
