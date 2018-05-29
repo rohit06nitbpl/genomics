@@ -219,17 +219,18 @@ def process_sample_data():
 
 def sample_data_dict():
 
-    data_dir = '/home/rohitjain/Projects/TFBS/repo/level_0-pipeline/dataset/sample_dataset'
+    data_dir = '/home/rohitjain/Projects/genomics/tfbs/source_code/tensorflow/dataset/dreamc/sample_dataset'
     aa_dict = create_aa_dict()
     aa_filename = 'aa_seq.fa'
     tfs = ['ATF3', 'ATF7']
 
     sample_data_dict = {
         'data_dir' : data_dir,
-        'max_queue_size_per_class' : 1000,
+        'max_queue_size_per_class' : 10000,
         'max_enqueue_buffer_per_class': 100,
-        'save_after_steps': 100,
+        'save_after_steps': 10,
         'summary_after_steps':10,
+        'attempt_dir': data_dir+'/attempt0',
         'n_classes' : 3,
         'class_type_index_dict' : {'U': 0, 'A': 1, 'B': 2},
         'nucleotide_dict' : {'N':0, 'A':1, 'T':2, 'G':3, 'C':4},

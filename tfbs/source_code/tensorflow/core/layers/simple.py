@@ -1,8 +1,11 @@
 import tensorflow as tf
 
+import variables
+
 class Simple1DCNN:
-    def __init__(self, kernel_shape, bias_shape, activation_fn = None,
+    def __init__(self, kernel_shape, bias_shape, var_scope, activation_fn = None,
                  stride = 1, padding = 'VALID', name = None):
+
         if name:
             self.name = name
         else:
@@ -11,23 +14,28 @@ class Simple1DCNN:
         self.activation_fn = activation_fn
         self.stride = stride
         self.padding = padding
-        with tf.name_scope(self.name):
-            self.kernel = tf.Variable(tf.truncated_normal(kernel_shape, stddev=0.1))
-            self.bias = tf.Variable(tf.constant(0.1, shape=bias_shape))
+
+        with tf.variable_scope(var_scope) as scope:
+            self.kernel = variables.Weights('/cpu:0').get('kernel', kernel_shape)
+            self.bias = variables.Biases('/cpu:0').get('bias', bias_shape)
 
     def forward(self, input_data):
         with tf.name_scope(self.name):
             if self.activation_fn:
                 if self.activation_fn == 'relu':
-                    return tf.nn.relu(tf.nn.conv1d(input_data, self.kernel, stride=self.stride,
-                                           padding=self.padding) + self.bias)
+                    conv_1d = tf.nn.conv1d(input_data, self.kernel, stride=self.stride, padding=self.padding) + self.bias
+                    return tf.nn.relu(conv_1d)
                 else:
                     raise NotImplementedError('Not implemented')
+            else:
+                return tf.nn.conv1d(input_data, self.kernel, stride=self.stride,
+                                    padding=self.padding) + self.bias
 
 
 class SimpleDNN:
-    def __init__(self, len_input_vector_, n_units, activation_fn = None,
+    def __init__(self, len_input_vector, n_units, var_scope, activation_fn = None,
                  keep_prob = 1.0, name = None):
+
         if name:
             self.name = name
         else:
@@ -36,9 +44,9 @@ class SimpleDNN:
         self.activation_fn = activation_fn
         self.keep_prob = keep_prob
 
-        with tf.name_scope(self.name):
-            self.weight = tf.Variable(tf.random_normal([len_input_vector_, n_units], stddev=0.1))
-            self.bias = tf.Variable(tf.constant(0.1, shape=[n_units]))
+        with tf.variable_scope(var_scope) as scope:
+            self.weight = variables.Weights('/cpu:0').get('fc_weights', [len_input_vector, n_units])
+            self.bias = variables.Biases('/cpu:0').get('bias', [n_units])
 
     def forward(self, input_data):
         with tf.name_scope(self.name):
@@ -48,6 +56,8 @@ class SimpleDNN:
                     activation = tf.nn.relu(matrix_product)
                 else:
                     raise NotImplementedError('Not implemented')
+            else:
+                activation = matrix_product #Just Matrix Multiplication
 
             if self.keep_prob < 1.0:
                 return tf.nn.dropout(activation, self.keep_prob)

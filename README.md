@@ -40,7 +40,7 @@ than single system.
  
 # Main features of the code:
 1. Very modular code, This same code can be used for training various kind of data and model by writing new stuff using inheritance in object oriented manner.
-2. For Example, for sample data set, I have only specific code in TFDataReader, TFBSFirstModel class and data_processing.py (file to process data itself). 
+2. For Example, for sample data set, I have only specific code in TFBSAAFileReader, TFBS_AA_CNN_MODEL class and data_processing.py (file to process data itself).
 3. Every other piece if code in pipeline can be leveraged as it is.
 4. It will be easy to extend this code on multi-gpu, modular manner would make it easier to do device placement of nodes. 
 5. I have used proper name scoping in again in modular manner to visualise graph in Tensorboard, along with tf.summaries,  
