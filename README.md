@@ -1,15 +1,17 @@
 # Genomics
 
+# Modular Distributed TensorFlow Framework
+
 # Extract Transform Load Pipeline
 1. Extract: Read using local file system (HDD or SSD) or remote file system (GCS or HDFS)
 2. Transform: Effectively utilize CPU cores to parse and perform pre processing, batching
 3. Load: Heavy lifting of computation on many GPUS or TPUs locally or across cluster
 
 # Feeding Data to Graph 
-1. Initialize Tensors with input data into the Graph: Bloat Graph size, Used for trivial problem and on single GPU, Very inefficient to duplicate Graph on multiple device
-2. Feed data into Graph using dictionary: Huge memory utilization, and also huge disk requirement for large preprocessed data
-3. Input pipeline using Queue: Queue Runner are implemented in pyhton, Efficients but can not saturate current generation multiple GPUs
-4. Input pipeline using tf.Data API: Implemented using C++, parallelize I/O, transform and load steps using background threads
+1. Initialize Tensors with input data into the Graph: Bloat Graph size, Used for trivial problem and on single GPU, Very inefficient to duplicate Graph on multiple devices
+2. Feed data into Graph using dictionary: Huge memory utilization, and also huge disk requirement for huge preprocessed data
+3. Input pipeline using Queue: Queue Runner are implemented in python, Efficient but can not saturate current generation multiple GPUs
+4. Input pipeline using tf.Data() API: Implemented using C++, parallelize I/O, transform and load steps using background threads, Recommended
 
 # Variable Distribution in Multi GPU and Distributed Model
 1. Parameter Servers: Parameters are pinned to parameter server, and they are implicitly copied to worker, gradient is computed at worker and aggregated at parameter server
@@ -22,7 +24,7 @@ Keeping local copies of variables allows for faster computation
 1. Multi GPUs Model, Uses Input Pipeline using Queue, Variable distribution are done using Parameter Server approach
 2. Parameter are pinned to CPU, and GPUs if available serves as worker
 3. Very Modular and Object Oriented Design, Core module abstract away basic routine functionality and also provide layers to implement new models
-4. For example, for sample dataset, I only implemented TFBSAAFileReader, TFBS_AA_CNN_MODEL classes apart from pre processing
+4. For example, for sample dataset, I only implemented TFBSAAFileReader, TFBS_AA_CNN_MODEL classes apart from pre-processing(initial, data specific)
 5. proper name scoping for visualization of Graph in Tensorborad along with tf.summaries
 6. data is passed using data_dict rather than command line parameter, cause this dict can be stored and retrieved in automated manner
 
@@ -67,8 +69,8 @@ This makes it slow to fill queue for class A. If you run my code, you will see, 
 It can be made much faster on cluster using big data technologies like Apache Spark and Hadoop, and They can gather data and push into queue much quickly 
 than a single system. 
  
-# To Do
-1. Upload 1D implementation of Capsules I used for TF Binding Problem
+# TODO
+1. Upload 1D implementation of Capsules, I used for TF Binding Problem
 2. Add Pipeline using tf.data() API and compare performances using real world data like mnist
 3. Complete Distributed implementation using https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks 
 

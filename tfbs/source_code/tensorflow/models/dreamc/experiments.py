@@ -15,7 +15,7 @@ def test():
         learning_rate=0.001,
     )
     model  = TFBS_AA_CNN_MODEL(hparams, 'queue')
-    gpus = []
+    gpus = [] # only cpu
     #gpus = ['/gpu:0', '/gpu:1'] #Assuming gpu 1 and gpu 2 are available
     model.train(data_dict, gpus, total_batch_size=10, n_epoch=1000, max_steps=-1)
 
